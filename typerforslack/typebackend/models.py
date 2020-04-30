@@ -11,4 +11,4 @@ class TypingRecord(models.Model):
     typeddate=models.DateTimeField('Practised On')
     
     def __str__(self):
-        return self.speed
+        return self.user_id.username
