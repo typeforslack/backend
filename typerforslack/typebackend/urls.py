@@ -4,7 +4,8 @@ from . import views
 
 urlpatterns=[
     path('',views.index,name='index'),
-   path('api-token-auth/',obtain_auth_token,name='token')
-    # path('register',views.register,name='register')
+    path('api-token-auth/',obtain_auth_token,name='Login_token'),
+    path('register',views.Register.as_view(),name='register'),
+    path('logout',views.Logout.as_view(),name='logout')
     # path('postspeed',views.postspeed,name='postspeed')
 ]
