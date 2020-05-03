@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
+from rest_framework.authtoken.models import Token
 from .models import TypingRecord
 
 class PraticeLogSerializer(serializers.ModelSerializer):
@@ -14,4 +15,5 @@ class RegisterSerializer(serializers.ModelSerializer):
     
     def create(self,validated_data):
         user=User.objects.create_user(username=validated_data['username'],password=validated_data['password'])
-        return user
+        token,status=Token.objects.get_or_create(user=user)
+        return token
