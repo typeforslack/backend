@@ -6,7 +6,8 @@ from .models import TypingRecord
 class PraticeLogSerializer(serializers.ModelSerializer):
     class Meta:
         model=TypingRecord
-        fields="__all__"
+        fields=["speed","typeddate"]
+    
 
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
@@ -15,5 +16,5 @@ class RegisterSerializer(serializers.ModelSerializer):
     
     def create(self,validated_data):
         user=User.objects.create_user(username=validated_data['username'],password=validated_data['password'])
-        token,status=Token.objects.get_or_create(user=user)
+        token,status=Token.objects.create(user=user)
         return token
