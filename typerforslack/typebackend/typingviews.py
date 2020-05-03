@@ -28,3 +28,12 @@ class PostSpeed(APIView):
 
         return Response(response_object)
         
+    def post(self,request):
+        serializers=PraticeLogSerializer(data=request.data,context={'request':request})
+        
+        if serializers.is_valid():  
+            user=serializers.save()
+            return Response({'success':serializers.data})
+        else:
+            print(serializers.errors)
+            return Response({'success':'False'})
