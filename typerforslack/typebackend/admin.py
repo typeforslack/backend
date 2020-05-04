@@ -1,9 +1,9 @@
 from django.contrib import admin
-from .models import TypingRecord
+from .models import PractiseLog
 
 # Register your models here.
 
 class TypingAdmin(admin.ModelAdmin):
-    list_display=['user_id','speed','typeddate']
+    list_display=['user','speed','taken_at']
 
-admin.site.register(TypingRecord,TypingAdmin)
+admin.site.register(PractiseLog,TypingAdmin)

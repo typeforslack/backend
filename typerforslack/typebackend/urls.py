@@ -8,5 +8,5 @@ urlpatterns=[
     path('api-token-auth/',obtain_auth_token,name='Login_token'),
     path('register',views.Register.as_view(),name='register'),
     path('logout',views.Logout.as_view(),name='logout'),
-    path('postspeed',typingviews.PostSpeed.as_view(),name='postspeed')
+    path('userlog',typingviews.PostSpeed.as_view(),name='userlog')
 ]

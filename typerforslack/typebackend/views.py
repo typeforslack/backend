@@ -16,24 +16,19 @@ class index(APIView):
         return Response(success)
 
 class Register(APIView):
-    def get(self,request):
-        get_user=User.objects.all()
-        serializer=RegisterSerializer(get_user,many=True)
-        return Response(serializer.data)
-
-    def post(self,request,format='json'):
+    def post(self,request):
         serializer=RegisterSerializer(data=request.data)
         if serializer.is_valid():
             user=serializer.save()
-            return Response({'success':'Registered','token':user.key})
+            return Response({'success':True,'token':user.key})
         else:
-            return Response({'success':'false','error':serializer.errors})
+            return Response({'success':False,'error':serializer.errors})
 
 class Logout(APIView):
     permission_classes=[IsAuthenticated]
     def get(self,request):
         request.user.auth_token.delete()
-        return Response({"success":"true"})
+        return Response({"success":True})
 
 
 

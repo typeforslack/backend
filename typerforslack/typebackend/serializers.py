@@ -1,17 +1,17 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
-from .models import TypingRecord
+from .models import PractiseLog
 from django.utils import timezone
 
-class PraticeLogSerializer(serializers.ModelSerializer):
+class PractiseLogSerializer(serializers.ModelSerializer):
     class Meta:
-        model=TypingRecord
-        fields=["user_id","speed","typeddate"]
+        model=PractiseLog
+        fields=["user","speed","taken_at"]
 
     def create(self,validated_data):
         user=self.context['request'].user
-        result=user.typingrecord_set.create(speed=validated_data['speed'],typeddate=validated_data['typeddate'])
+        result=user.practiselog_set.create(speed=validated_data['speed'],taken_at=validated_data['taken_at'])
         return result
 
 class RegisterSerializer(serializers.ModelSerializer):
