@@ -1,0 +1,1 @@
+web: gunicorn typerforslack.wsgi --log-file -
