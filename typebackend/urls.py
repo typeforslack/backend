@@ -9,5 +9,5 @@ urlpatterns=[
     path('register',views.Register.as_view(),name='register'),
     path('logout',views.Logout.as_view(),name='logout'),
     path('userlog',typingviews.PostSpeed.as_view(),name='userlog'),
-  
+    path('para',typingviews.Paradetails.as_view(),name='para')
 ]
