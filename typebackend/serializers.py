@@ -7,12 +7,18 @@ from django.utils import timezone
 class PractiseLogSerializer(serializers.ModelSerializer):
     class Meta:
         model=PractiseLog
-        fields=["user","speed","taken_at"]
+        fields=["speed","taken_at"]
 
     def create(self,validated_data):
         user=self.context['request'].user
         result=user.practiselog_set.create(speed=validated_data['speed'],taken_at=validated_data['taken_at'])
         return result
+
+    def to_representation(self,instance):
+        response=super(PractiseLogSerializer,self).to_representation(instance)
+        response['username']=instance.user.username
+        return response
+    
 
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:

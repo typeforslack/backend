@@ -11,4 +11,4 @@ class PractiseLog(models.Model):
     taken_at=models.DateTimeField('Practised On')
     
     def __str__(self):
-        return self.user_id.username
+        return self.user.username

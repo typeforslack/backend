@@ -1,5 +1,4 @@
 .env
 env/
-typerforslack/settings/local.py
-typerforslack/__pycache__/
-typebackend/__pycache__/
+local.py
+__pycache__/
