@@ -1,22 +1,25 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
-from .models import PractiseLog
+from .models import PractiseLog,Paragraph
 from django.utils import timezone
 
+
 class PractiseLogSerializer(serializers.ModelSerializer):
+
     class Meta:
         model=PractiseLog
-        fields=["speed","taken_at"]
+        fields=["para","speed","taken_at"]
 
     def create(self,validated_data):
         user=self.context['request'].user
-        result=user.practiselog_set.create(speed=validated_data['speed'],taken_at=validated_data['taken_at'])
+        result=user.practiselog_set.create(para=validated_data['para'],speed=validated_data['speed'],taken_at=validated_data['taken_at'])
         return result
 
     def to_representation(self,instance):
         response=super(PractiseLogSerializer,self).to_representation(instance)
         response['username']=instance.user.username
+        response['para']=Paragraph.objects.get(id=instance.para.id).para
         return response
     
 

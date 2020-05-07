@@ -7,8 +7,16 @@ from django.core.validators import MaxValueValidator
 
 class PractiseLog(models.Model):
     user=models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,null=True)
+    para=models.ForeignKey('Paragraph',on_delete=models.CASCADE)
     speed=models.IntegerField(db_column='Typing Speed',validators=[MaxValueValidator(400)])
     taken_at=models.DateTimeField('Practised On')
     
     def __str__(self):
         return self.user.username
+
+class Paragraph(models.Model):
+    para_from=models.CharField('Taken from',max_length=25)
+    para=models.TextField('Paragraph')
+
+    def __str__(self):
+        return self.para_from
