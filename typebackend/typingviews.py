@@ -11,14 +11,12 @@ from random import randint
 import datetime
 
 
+previous_para_number=None
 
-previous_para_id=None
-
-def generateNewParaNumber(previous_para_id,totalcount):
-    new_number=None
+def generateNewParaNumber(previous_para_number,totalcount):
     new_number=randint(0,totalcount-1)
-    if previous_para_id==new_number:
-        return generateNewParaNumber(previous_para_id,totalcount)
+    if previous_para_number==new_number:
+        return generateNewParaNumber(previous_para_number,totalcount)
     return new_number
 
 class PostSpeed(APIView):
@@ -54,19 +52,17 @@ class Paradetails(APIView):
    
     def get(self,request):
         
-        global previous_para_id
+        global previous_para_number
+        total_no_of_paragraph=Paragraph.objects.count()
+        para_position=randint(0,total_no_of_paragraph-1)
 
-        total_para=Paragraph.objects.count()
-        para_number=randint(0,total_para-1)
+        if(previous_para_number==para_position):
+            para_position=generateNewParaNumber(previous_para_number,total_no_of_paragraph)
 
-        if(previous_para_id==para_number):
-            para_number=generateNewParaNumber(previous_para_id,total_para)
-
-        para_details=Paragraph.objects.all()[para_number]
+        para_details=Paragraph.objects.all()[para_position]
         serializers=ParagraphSerializer(para_details)
-        previous_para_id=para_number
-     
-       
+        previous_para_number=para_position
+    
         return Response(serializers.data)
 
 

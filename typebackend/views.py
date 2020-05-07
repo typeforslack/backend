@@ -13,7 +13,7 @@ class index(APIView):
     renderer_classes = [JSONRenderer]
     def get(self,request):
         success={
-            'status':'Server is running'
+            'status':'Server is running!'
         }
         return Response(success)
 

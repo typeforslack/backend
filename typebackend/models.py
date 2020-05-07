@@ -15,7 +15,7 @@ class PractiseLog(models.Model):
         return self.user.username
 
 class Paragraph(models.Model):
-    para_from=models.CharField('Taken from',max_length=25)
+    taken_from=models.CharField('Taken from',max_length=25)
     para=models.TextField('Paragraph')
 
     def __str__(self):
