@@ -19,4 +19,4 @@ class Paragraph(models.Model):
     para=models.TextField('Paragraph')
 
     def __str__(self):
-        return self.para_from
+        return self.taken_from
