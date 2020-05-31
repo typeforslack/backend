@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.renderers import JSONRenderer
+from rest_framework import status
 from rest_framework.response import Response
 from django.contrib.auth.models import User
 from .serializers import RegisterSerializer
@@ -24,14 +25,10 @@ class Register(APIView):
             user=serializer.save()
             return Response({'success':True,'token':user.key})
         else:
-            return Response({'success':False,'error':serializer.errors})
+            return Response({'success':False,'error':serializer.errors},status=status.HTTP_400_BAD_REQUEST)
 
 class Logout(APIView):
     permission_classes=[IsAuthenticated]
     def get(self,request):
         request.user.auth_token.delete()
         return Response({"success":True})
-
-
-
-

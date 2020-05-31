@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import status
 from django.contrib.auth.models import User
 from .models import PractiseLog,Paragraph
 from .serializers import PractiseLogSerializer,ParagraphSerializer
@@ -45,7 +46,7 @@ class PostSpeed(APIView):
             user=serializers.save()
             return Response({'success':True})
         else:
-            return Response({'success':False,'error':serializers.errors})
+            return Response({'success':False,'error':serializers.errors},status=status.HTTP_400_BAD_REQUEST)
 
 class Paradetails(APIView):
     permission_classes=[IsAdminUser]
@@ -73,4 +74,4 @@ class Paradetails(APIView):
             para=serializers.save()
             return Response({'success':True})
         else:
-            return Response({'success':False,'error':serializers.errors})
+            return Response({'success':False,'error':serializers.errors},status=status.HTTP_400_BAD_REQUEST)
