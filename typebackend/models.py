@@ -16,7 +16,7 @@ class PractiseLog(models.Model):
 
 class Paragraph(models.Model):
     taken_from=models.CharField('Taken from',max_length=25)
-    para=models.TextField('Paragraph')
+    para=models.TextField('Paragraph',unique=True)
 
     def __str__(self):
         return self.taken_from

@@ -11,7 +11,6 @@ from django.utils import timezone
 from random import randint
 import datetime
 
-
 previous_para_number=None
 
 def generateNewParaNumber(previous_para_number,totalcount):
@@ -49,7 +48,7 @@ class PostSpeed(APIView):
             return Response({'success':False,'error':serializers.errors},status=status.HTTP_400_BAD_REQUEST)
 
 class Paradetails(APIView):
-    permission_classes=[IsAdminUser]
+    permission_classes=[IsAuthenticated]
    
     def get(self,request):
         
@@ -65,7 +64,6 @@ class Paradetails(APIView):
         previous_para_number=para_position
     
         return Response(serializers.data)
-
 
     def post(self,request):
         serializers=ParagraphSerializer(data=request.data)

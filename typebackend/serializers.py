@@ -10,7 +10,8 @@ class ParagraphSerializer(serializers.ModelSerializer):
         fields="__all__"
 
     def create(self,validated_data):
-        savedpara=Paragraph.objects.create(taken_from=validated_data['taken_from'],para=validated_data['para'])
+        taken_from=validated_data['taken_from'].lower()
+        savedpara=Paragraph.objects.create(taken_from=taken_from,para=validated_data['para'])
         return savedpara
 
 
