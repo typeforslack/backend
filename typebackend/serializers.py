@@ -10,7 +10,8 @@ class ParagraphSerializer(serializers.ModelSerializer):
         fields="__all__"
 
     def create(self,validated_data):
-        savedpara=Paragraph.objects.create(taken_from=validated_data['taken_from'],para=validated_data['para'])
+        taken_from=validated_data['taken_from'].lower()
+        savedpara=Paragraph.objects.create(taken_from=taken_from,para=validated_data['para'])
         return savedpara
 
 
@@ -26,7 +27,6 @@ class PractiseLogSerializer(serializers.ModelSerializer):
 
     def to_representation(self,instance):
         response=super(PractiseLogSerializer,self).to_representation(instance)
-        response['username']=instance.user.username
         response['para']=Paragraph.objects.get(id=instance.para.id).para
         return response
     
