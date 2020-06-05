@@ -26,7 +26,7 @@ class PostSpeed(APIView):
         sum=0
         today = timezone.now().replace(hour=0,minute=0,second=0)
         tmrw=today+datetime.timedelta(days=1)
-        user_typing_log=PractiseLog.objects.filter(user__username=request.user,taken_at__gt=today,taken_at__lt=tmrw)
+        user_typing_log=PractiseLog.objects.filter(user=request.user,taken_at__gt=today,taken_at__lt=tmrw)
         serializers=PractiseLogSerializer(user_typing_log,many=True)
 
         for data in serializers.data:
