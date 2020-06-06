@@ -1,5 +1,14 @@
 # TypeForSlack - BACKEND
 
+## Installation
+1. Install Python and Postgres
+2. Setup virutalenv if you want
+3. Setup Postgres with user `sanjay`, password `typeit`, database `typeforslack` running in local.
+4. Then run `pip install -r requirements.txt`
+5. Then migrate if any changes `python manage.py migrate`
+6. Run development server `python manage.py runserver`
+
+## Contracts
 **BASE-URL:** https://typeforslack.herokuapp.com
 
 **ENDPOINTS:**

@@ -30,7 +30,7 @@ DEBUG = config('DEBUG', default=True, cast=bool)
 LOCAL_URl = 'postgres://sanjay:typeit@localhost/typeforslack'
 DATABASE_URL = config('DATABASE_URL', default=LOCAL_URl, cast=str)
 DATABASES = {}
-DATABASES['default'] = dj_database_url.parse(DATABASE_URL, conn_max_age=1000)
+DATABASES['default'] = dj_database_url.parse(DATABASE_URL, conn_max_age=100000)
 
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default="*", cast=lambda v: [s.strip() for s in v.split(',')])
@@ -46,7 +46,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'corsheaders',
     'rest_framework.authtoken'
 ]
 
