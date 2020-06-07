@@ -1,6 +1,7 @@
 # TypeForSlack - BACKEND
 
 ## Installation
+
 1. Install Python and Postgres
 2. Setup virutalenv if you want
 3. Setup Postgres with user `sanjay`, password `typeit`, database `typeforslack` running in local.
@@ -9,6 +10,7 @@
 6. Run development server `python manage.py runserver`
 
 ## Contracts
+
 **BASE-URL:** https://typeforslack.herokuapp.com
 
 **ENDPOINTS:**
@@ -37,11 +39,11 @@
 
     API: /userlog
     Method: POST
-    Request Format: {para: Integer, speed: Integer, taken_at: DatetimeFormat}
+    Request Format: {para: Integer, wpm: Integer, taken_at: DatetimeFormat, correct_words: Integer, wrong_words: Integer, total_words: Integer, accuracy: Float}
     Response: {success: Boolean}
 
     Method: GET
-    Response: { avg: Integer, logs: [{para: String, speed: Integer, taken_at}]}
+    Response: { avg: Integer, logs: [{para: String, wpm: Integer, taken_at: DatetimeFormat, correct_words: Integer, wrong_words: Integer, total_words: Integer, accuracy: Float}]}
 
 **- Creating and retriveing paragraphs:**
 
