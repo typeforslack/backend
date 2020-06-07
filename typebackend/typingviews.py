@@ -29,7 +29,7 @@ class PostSpeed(APIView):
         serializers=PractiseLogSerializer(user_typing_log,many=True)
 
         for data in serializers.data:
-            sum+=data["speed"]
+            sum+=data["wpm"]
 
         response_object={
             'avg':int(sum/len(serializers.data)) if len(serializers.data)>0 else False,

@@ -8,9 +8,13 @@ from django.core.validators import MaxValueValidator
 class PractiseLog(models.Model):
     user=models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,null=True)
     para=models.ForeignKey('Paragraph',on_delete=models.CASCADE)
-    speed=models.IntegerField(db_column='Typing Speed',validators=[MaxValueValidator(400)])
+    wpm=models.IntegerField(db_column='Typing Speed',validators=[MaxValueValidator(400)])
     taken_at=models.DateTimeField('Practised On')
-    
+    correct_words=models.IntegerField(db_column='Total correct words')
+    wrong_words=models.IntegerField(db_column='Wrong Words')
+    total_words=models.IntegerField(db_column='Total Words')
+    accuracy=models.FloatField(db_column='Accuracy')
+
     def __str__(self):
         return self.user.username
 
