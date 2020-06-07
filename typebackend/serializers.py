@@ -27,7 +27,7 @@ class PractiseLogSerializer(serializers.ModelSerializer):
 
     def to_representation(self,instance):
         response=super(PractiseLogSerializer,self).to_representation(instance)
-        response['para']=Paragraph.objects.get(id=instance.para.id).para
+        response.pop('para')
         return response
     
 
