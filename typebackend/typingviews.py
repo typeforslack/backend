@@ -11,12 +11,12 @@ from django.utils import timezone
 from random import randint
 import datetime
 
-previous_para_number=None
+previous_typed=None
 
-def generateNewParaNumber(previous_para_number,totalcount):
-    new_number=randint(0,totalcount-1)
-    if previous_para_number==new_number:
-        return generateNewParaNumber(previous_para_number,totalcount)
+def generateNewParaNumber(typed_para,totalcount):
+    new_number=randint(0,totalcount)
+    if new_number in typed_para:
+        return generateNewParaNumber(typed_para,totalcount)
     return new_number
 
 class PostSpeed(APIView):
@@ -51,17 +51,28 @@ class Paradetails(APIView):
     permission_classes=[IsAuthenticated]
    
     def get(self,request):
-        
-        global previous_para_number
-        total_no_of_paragraph=Paragraph.objects.count()
-        para_position=randint(0,total_no_of_paragraph-1)
+        global previous_typed
+        typed_para=[]
 
-        if(previous_para_number==para_position):
-            para_position=generateNewParaNumber(previous_para_number,total_no_of_paragraph)
+        userlog=PractiseLog.objects.filter(user=request.user)
 
+        for data in userlog:
+            typed_para_id=data.para.id-1
+            typed_para.append(typed_para_id)
+
+        total_no_of_paragraph=Paragraph.objects.count()-1
+        para_position=randint(0,total_no_of_paragraph)
+
+        if total_no_of_paragraph in typed_para:
+            if previous_typed==para_position:
+                para_position=generateNewParaNumber([para_position],total_no_of_paragraph)
+        else:
+            if para_position in typed_para:
+                para_position=generateNewParaNumber(typed_para,total_no_of_paragraph)
+            
         para_details=Paragraph.objects.all()[para_position]
         serializers=ParagraphSerializer(para_details)
-        previous_para_number=para_position
+        previous_typed=para_position
     
         return Response(serializers.data)
 
