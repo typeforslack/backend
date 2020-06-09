@@ -13,10 +13,10 @@ import datetime
 
 previous_typed=None
 
-def generateNewParaNumber(typed_para,totalcount):
+def generateNewParaNumber(paraid,totalcount):
     new_number=randint(0,totalcount)
-    if new_number in typed_para:
-        return generateNewParaNumber(typed_para,totalcount)
+    if new_number in paraid:
+        return generateNewParaNumber(paraid,totalcount)
     return new_number
 
 class PostSpeed(APIView):
@@ -36,24 +36,19 @@ class Paradetails(APIView):
    
     def get(self,request):
         global previous_typed
-        typed_para=[]
 
-        userlog=PractiseLog.objects.filter(user=request.user)
+        # Query to find the paragraph that are yet to be typed by the user
+        para_typed=PractiseLog.objects.filter(user_id=request.user).values_list('para_id',flat=True)
+        para_yet_to_be_typed=Paragraph.objects.exclude(id__in=list(para_typed))
 
-        for data in userlog:
-            typed_para_id=data.para.id-1
-            typed_para.append(typed_para_id)
+        paragraph_count=Paragraph.objects.count()-1
+        para_position=randint(0,paragraph_count)
 
-        total_no_of_paragraph=Paragraph.objects.count()-1
-        para_position=randint(0,total_no_of_paragraph)
+        if len(para_yet_to_be_typed)==0 and previous_typed==para_position:
+                para_position=generateNewParaNumber([para_position],paragraph_count)
+        elif len(para_yet_to_be_typed)!=0: 
+                para_position=para_yet_to_be_typed[0]
 
-        if total_no_of_paragraph in typed_para:
-            if previous_typed==para_position:
-                para_position=generateNewParaNumber([para_position],total_no_of_paragraph)
-        else:
-            if para_position in typed_para:
-                para_position=generateNewParaNumber(typed_para,total_no_of_paragraph)
-            
         para_details=Paragraph.objects.all()[para_position]
         serializers=ParagraphSerializer(para_details)
         previous_typed=para_position
@@ -69,10 +64,10 @@ class Paradetails(APIView):
         else:
             return Response({'success':False,'error':serializers.errors},status=status.HTTP_400_BAD_REQUEST)
 
-class Graphdata(APIView):
+class DashboardData(APIView):
     permission_classes=[IsAuthenticated]
 
-    def get(self,request,days):  
+    def get(self,request,days=0):  
         date_typed_log={}
 
         userlog=PractiseLog.objects.filter(user=request.user,taken_at__gte=timezone.now()-datetime.timedelta(days=int(days)))
