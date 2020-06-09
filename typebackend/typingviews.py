@@ -14,8 +14,8 @@ import datetime
 previous_typed=None
 
 def generateNewParaNumber(paraid,totalcount):
-    new_number=randint(0,totalcount)
-    if new_number in paraid:
+    new_number=randint(1,totalcount)
+    if new_number==paraid:
         return generateNewParaNumber(paraid,totalcount)
     return new_number
 
@@ -41,18 +41,18 @@ class Paradetails(APIView):
         para_typed=PractiseLog.objects.filter(user_id=request.user).values_list('para_id',flat=True)
         para_yet_to_be_typed=Paragraph.objects.exclude(id__in=list(para_typed))
 
-        paragraph_count=Paragraph.objects.count()-1
-        para_position=randint(0,paragraph_count)
-
+        paragraph_count=Paragraph.objects.count()
+        para_position=randint(1,paragraph_count)
+     
         if len(para_yet_to_be_typed)==0 and previous_typed==para_position:
-                para_position=generateNewParaNumber([para_position],paragraph_count)
-        elif len(para_yet_to_be_typed)!=0: 
-                para_position=para_yet_to_be_typed[0]
+                para_position=generateNewParaNumber(para_position,paragraph_count)
 
-        para_details=Paragraph.objects.all()[para_position]
+        elif len(para_yet_to_be_typed)!=0:
+                para_position=para_yet_to_be_typed[0].id
+
+        para_details=Paragraph.objects.get(id=para_position)
         serializers=ParagraphSerializer(para_details)
         previous_typed=para_position
-    
         return Response(serializers.data)
 
     def post(self,request):
