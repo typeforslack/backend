@@ -21,23 +21,7 @@ def generateNewParaNumber(typed_para,totalcount):
 
 class PostSpeed(APIView):
     permission_classes=[IsAuthenticated]
-    def get(self,request):
-        sum=0
-        today = timezone.now().replace(hour=0,minute=0,second=0)
-        tmrw=today+datetime.timedelta(days=1)
-        user_typing_log=PractiseLog.objects.filter(user=request.user,taken_at__gt=today,taken_at__lt=tmrw)
-        serializers=PractiseLogSerializer(user_typing_log,many=True)
 
-        for data in serializers.data:
-            sum+=data["wpm"]
-
-        response_object={
-            'avg':int(sum/len(serializers.data)) if len(serializers.data)>0 else False,
-            'logs':serializers.data
-            }
-
-        return Response(response_object)
-        
     def post(self,request):
         serializers=PractiseLogSerializer(data=request.data,context={'request':request})
         
@@ -84,3 +68,24 @@ class Paradetails(APIView):
             return Response({'success':True})
         else:
             return Response({'success':False,'error':serializers.errors},status=status.HTTP_400_BAD_REQUEST)
+
+class Graphdata(APIView):
+    permission_classes=[IsAuthenticated]
+
+    def get(self,request,days):  
+        date_typed_log={}
+
+        userlog=PractiseLog.objects.filter(user=request.user,taken_at__gte=timezone.now()-datetime.timedelta(days=int(days)))
+        log_serializer=PractiseLogSerializer(userlog,many=True)
+
+        for data in log_serializer.data:
+    
+            date_typed=str(data["taken_at"])[0:10]
+            data.pop('taken_at')
+    
+            if date_typed_log.get(date_typed):
+                date_typed_log[date_typed].append(data)        
+            else:
+                date_typed_log[date_typed]=[data]
+
+        return Response(date_typed_log)
