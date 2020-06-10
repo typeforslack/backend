@@ -18,6 +18,18 @@ class index(APIView):
         }
         return Response(success)
 
+class UserNameAvailability(APIView):
+    def get(self,request):
+        username=request.GET.get('username',None)
+        
+        data={
+            'is_taken':User.objects.filter(username=username).exists(),
+        }
+        if data['is_taken']:
+            data['error']='Username already exists'
+
+        return Response(data)
+
 class Register(APIView):
     def post(self,request):
         serializer=RegisterSerializer(data=request.data)
