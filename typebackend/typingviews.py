@@ -10,14 +10,7 @@ from rest_framework.authtoken.models import Token
 from django.utils import timezone
 from random import randint,choice
 import datetime
-
-previous_typed=None
-
-def generateNewParaNumber(paraid,totalcount):
-    new_number=randint(1,totalcount)
-    if new_number==paraid:
-        return generateNewParaNumber(paraid,totalcount)
-    return new_number
+import time
 
 class PostSpeed(APIView):
     permission_classes=[IsAuthenticated]
@@ -35,8 +28,6 @@ class Paradetails(APIView):
     permission_classes=[IsAuthenticated]
    
     def get(self,request):
-        global previous_typed
-        
         #For Testing Purpose
         if(request.user.id==38):
             para_ids=[1,14,15]
@@ -46,21 +37,20 @@ class Paradetails(APIView):
             return Response(serializers.data)
         
         # Query to find the paragraph that are yet to be typed by the user
-        para_typed=PractiseLog.objects.filter(user_id=request.user).values_list('para_id',flat=True)
-        para_yet_to_be_typed=Paragraph.objects.exclude(id__in=list(para_typed))
+        paras_typed=PractiseLog.objects.filter(user_id=38).order_by('taken_at')
+        paras_typed_ids = paras_typed.values_list('para_id', flat=True)
+        para_yet_to_be_typed=Paragraph.objects.exclude(id__in=list(paras_typed_ids))
 
-        paragraph_count=Paragraph.objects.count()
-        para_position=randint(1,paragraph_count)
-     
-        if len(para_yet_to_be_typed)==0 and previous_typed==para_position:
-                para_position=generateNewParaNumber(para_position,paragraph_count)
+        if len(para_yet_to_be_typed)!=0:
+            para_details = choice(para_yet_to_be_typed)
+        else:
+            # When user has typed all the paras
+            # Remove last 5 paras user typed and give random from that new list
+            without_last_five = paras_typed[:len(paras_typed)-5]
+            chosen_one = choice(without_last_five)
+            para_details = chosen_one.para
 
-        elif len(para_yet_to_be_typed)!=0:
-                para_position=para_yet_to_be_typed[0].id
-
-        para_details=Paragraph.objects.get(id=para_position)
         serializers=ParagraphSerializer(para_details)
-        previous_typed=para_position
         return Response(serializers.data)
 
     def post(self,request):
