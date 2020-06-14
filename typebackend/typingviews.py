@@ -10,7 +10,6 @@ from rest_framework.authtoken.models import Token
 from django.utils import timezone
 from random import randint,choice
 import datetime
-import time
 
 class PostSpeed(APIView):
     permission_classes=[IsAuthenticated]
@@ -37,7 +36,7 @@ class Paradetails(APIView):
             return Response(serializers.data)
         
         # Query to find the paragraph that are yet to be typed by the user
-        paras_typed=PractiseLog.objects.filter(user_id=38).order_by('taken_at')
+        paras_typed=PractiseLog.objects.filter(user_id=request.user.id).order_by('taken_at')
         paras_typed_ids = paras_typed.values_list('para_id', flat=True)
         para_yet_to_be_typed=Paragraph.objects.exclude(id__in=list(paras_typed_ids))
 
