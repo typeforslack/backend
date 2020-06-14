@@ -22,6 +22,11 @@
     Request Format: { username: String, password: String, email: EmailFormat }
     Response: { success: Boolean, token: String }
 
+    API: /validate-username
+    Method: GET
+    Params: username <String>
+    Response: { istaken: Boolean , error: String }
+
 **- Login:**
 
     API: /api-token-auth/

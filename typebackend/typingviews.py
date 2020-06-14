@@ -8,7 +8,7 @@ from .serializers import PractiseLogSerializer,ParagraphSerializer
 from rest_framework.permissions import IsAuthenticated,IsAdminUser
 from rest_framework.authtoken.models import Token
 from django.utils import timezone
-from random import randint
+from random import randint,choice
 import datetime
 
 previous_typed=None
@@ -36,7 +36,15 @@ class Paradetails(APIView):
    
     def get(self,request):
         global previous_typed
-
+        
+        #For Testing Purpose
+        if(request.user.id==38):
+            para_ids=[1,14,15]
+            para_position=choice(para_ids)
+            para=Paragraph.objects.get(id=para_position)
+            serializers=ParagraphSerializer(para)
+            return Response(serializers.data)
+        
         # Query to find the paragraph that are yet to be typed by the user
         para_typed=PractiseLog.objects.filter(user_id=request.user).values_list('para_id',flat=True)
         para_yet_to_be_typed=Paragraph.objects.exclude(id__in=list(para_typed))
