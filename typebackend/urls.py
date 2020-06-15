@@ -11,5 +11,6 @@ urlpatterns=[
     path('logout',views.Logout.as_view(),name='logout'),
     path('userlog',typingviews.PostSpeed.as_view(),name='userlog'),
     path('para',typingviews.Paradetails.as_view(),name='para'),
+    path('paraForRaceTrack',typingviews.RaceTrack.as_view(),name='racetrack'),
     re_path(r'^getuserlog/(?:last=(?P<days>\d+)/)?$',typingviews.DashboardData.as_view(),name='graph')
 ]

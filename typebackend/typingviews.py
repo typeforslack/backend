@@ -10,6 +10,7 @@ from rest_framework.authtoken.models import Token
 from django.utils import timezone
 from random import randint,choice
 import datetime
+import json
 
 class PostSpeed(APIView):
     permission_classes=[IsAuthenticated]
@@ -81,3 +82,10 @@ class DashboardData(APIView):
                 date_typed_log[date_typed]=[data]
 
         return Response(date_typed_log)
+
+class RaceTrack(APIView):
+    def get(self,request):
+        data=json.loads(request.query_params['data'])
+        para_yet_to_be_typed=Paragraph.objects.exclude(id__in=data)
+        serializers=ParagraphSerializer(para_yet_to_be_typed[0])
+        return Response({'success':True,'para':serializers.data})
