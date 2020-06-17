@@ -7,7 +7,7 @@ from django.utils import timezone
 class ParagraphSerializer(serializers.ModelSerializer):
     class Meta:
         model=Paragraph
-        fields=['taken_from','para']        
+        fields=['id','taken_from','para']        
 
     def create(self,validated_data):
         taken_from=validated_data['taken_from'].lower()

@@ -87,5 +87,8 @@ class RaceTrack(APIView):
     def get(self,request):
         data=json.loads(request.query_params['data'])
         para_yet_to_be_typed=Paragraph.objects.exclude(id__in=data)
-        serializers=ParagraphSerializer(para_yet_to_be_typed[0])
-        return Response({'success':True,'para':serializers.data})
+        if(len(para_yet_to_be_typed)==0):
+            para_yet_to_be_typed=Paragraph.objects.all()
+        chosen_paragraph=choice(para_yet_to_be_typed)
+        serializers=ParagraphSerializer(chosen_paragraph)
+        return Response(serializers.data)
