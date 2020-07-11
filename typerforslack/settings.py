@@ -27,7 +27,8 @@ DEBUG = config('DEBUG', default=True, cast=bool)
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-LOCAL_URl = 'postgres://sanjay:typeit@localhost/typeforslack'
+LOCAL_URl = 'postgres://aravind:password@localhost/typeforslack'
+
 DATABASE_URL = config('DATABASE_URL', default=LOCAL_URl, cast=str)
 DATABASES = {}
 DATABASES['default'] = dj_database_url.parse(DATABASE_URL, conn_max_age=100000)
@@ -46,7 +47,23 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'rest_framework.authtoken'
+    'rest_framework.authtoken',
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+]
+SITE_ID = 1
+
+AUTHENTICATION_BACKENDS = [
+    
+    # Needed to login by username in Django admin, regardless of `allauth`
+    'django.contrib.auth.backends.ModelBackend',
+
+    # `allauth` specific authentication methods, such as login by e-mail
+    'allauth.account.auth_backends.AuthenticationBackend',
+    
 ]
 
 REST_FRAMEWORK={
