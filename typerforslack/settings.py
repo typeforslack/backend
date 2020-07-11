@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
+    'rest_auth',
     'django.contrib.sites',
     'allauth',
     'allauth.account',
@@ -82,7 +83,7 @@ ACCOUNT_EMAIL_REQUIRED = False
 ACCOUNT_EMAIL_VERIFICATION = "none"
 ACCOUNT_LOGIN_ATTEMPTS_LIMIT = 5
 ACCOUNT_LOGIN_ATTEMPTS_TIMEOUT = 86400 # 1 day in seconds
-LOGIN_REDIRECT_URL = '/' # default to /accounts/profile 
+LOGIN_REDIRECT_URL = '/' # default to /accounts/profile . upon successful login where the page should redirect to 
 
 REST_FRAMEWORK={
     'DEFAULT_AUTHENTICATION_CLASSES':[

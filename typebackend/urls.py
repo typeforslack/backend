@@ -1,4 +1,4 @@
-from django.urls import path,re_path
+from django.urls import include,path,re_path
 from rest_framework.authtoken.views import obtain_auth_token
 from . import views
 from . import typingviews
@@ -12,5 +12,6 @@ urlpatterns=[
     path('userlog',typingviews.PostSpeed.as_view(),name='userlog'),
     path('para',typingviews.Paradetails.as_view(),name='para'),
     path('paraForRaceTrack',typingviews.RaceTrack.as_view(),name='racetrack'),
-    re_path(r'^getuserlog/(?:last=(?P<days>\d+)/)?$',typingviews.DashboardData.as_view(),name='graph')
+    re_path(r'^getuserlog/(?:last=(?P<days>\d+)/)?$',typingviews.DashboardData.as_view(),name='graph'),
+    path('signup/', include('allauth.urls')),
 ]
