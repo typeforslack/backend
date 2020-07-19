@@ -40,8 +40,8 @@ class LoginOrSignUpForGoogleUsers(APIView):
                 else:
                     return Response({'success':False,'error':serializer.errors},status=status.HTTP_400_BAD_REQUEST)
             else:
-                user_details=User.objects.get(email=email)
-                if user_details:
+                user_details=User.objects.filter(email=email)
+                if len(user_details)!=0:
                     token=Token.objects.create(user=user_details)
                     return Response({'token':token.key})
                 else:
