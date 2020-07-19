@@ -34,6 +34,20 @@
     Request Format:{ username: String, password: String }
     Response: { token: String }
 
+**- Registering google users:**
+
+    API: /register-for-google-user
+    Method: POST
+    Request Format:{ username: String, token: hash }
+    Response: { success: Boolean, token: String }
+
+**- Login for google users:**
+
+    API: /login-with-google
+    Method: POST
+    Request Format:{ token: hash }
+    Response: { token: String }
+
 **- Logout:**
 
     API: /logout
