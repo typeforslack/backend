@@ -11,7 +11,6 @@ from decouple import config
 from random import randint
 import time
 
-# Create your views here.
 
 class Register(APIView):
     def post(self,request):
@@ -30,7 +29,8 @@ class LoginOrSignUpForGoogleUsers(APIView):
 
         if id_info['email_verified']:
             email=id_info['email']
-            if username:
+            user_details=User.objects.filter(email=email).first()
+            if username and user_details is None:
                 password=hash(email)*randint(0,int(round(time.time() * 1000)))
                 data={'email':email,'username':username,'password':password}
                 serializer=RegisterSerializer(data=data)
@@ -39,15 +39,15 @@ class LoginOrSignUpForGoogleUsers(APIView):
                     return Response({'success':True,'token':user.key})
                 else:
                     return Response({'success':False,'error':serializer.errors},status=status.HTTP_400_BAD_REQUEST)
-            else:
-                user_details=User.objects.filter(email=email)
-                if len(user_details)!=0:
+            elif user_details:
+                if username is None:
                     token=Token.objects.create(user=user_details)
                     return Response({'token':token.key})
-                else:
-                    return Response({'error':'Invalid Credential'},status=status.HTTP_400_BAD_REQUEST)
+                return Response({'error':'Account exists!'},status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response({'error':'New account, please register!'},status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response({'error':'Invalid Credential'},status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error':'Invalid email ID '},status=status.HTTP_400_BAD_REQUEST)
 
 class Logout(APIView):
     permission_classes=[IsAuthenticated]
