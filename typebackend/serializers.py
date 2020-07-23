@@ -18,12 +18,12 @@ class ParagraphSerializer(serializers.ModelSerializer):
 class PractiseLogSerializer(serializers.ModelSerializer):
     class Meta:
         model=PractiseLog
-        fields=["para","wpm","taken_at","correct_words","wrong_words","total_words","accuracy"]
+        fields=["para","wpm","taken_at","correct_words","wrong_words","total_words","accuracy","mode"]
         extra_kwargs = {'para': {'write_only': True}}
 
     def create(self,validated_data):
         user=self.context['request'].user
-        result=user.practiselog_set.create(para=validated_data['para'],wpm=validated_data['wpm'],correct_words=validated_data['correct_words'],wrong_words=validated_data['wrong_words'],total_words=validated_data['total_words'],accuracy=validated_data['accuracy'],taken_at=validated_data['taken_at'])
+        result=user.practiselog_set.create(para=validated_data['para'],wpm=validated_data['wpm'],correct_words=validated_data['correct_words'],wrong_words=validated_data['wrong_words'],total_words=validated_data['total_words'],accuracy=validated_data['accuracy'],taken_at=validated_data['taken_at'],mode=validated_data['mode'])
         return result
 
 class RegisterSerializer(serializers.ModelSerializer):

@@ -14,7 +14,7 @@ class PractiseLog(models.Model):
     wrong_words=models.IntegerField(db_column='Wrong Words')
     total_words=models.IntegerField(db_column='Total Words')
     accuracy=models.FloatField(db_column='Accuracy')
-
+    mode=models.CharField(max_length=9)
     def __str__(self):
         return self.user.username
 

@@ -16,13 +16,13 @@ class PostSpeed(APIView):
     permission_classes=[IsAuthenticated]
 
     def post(self,request):
-        serializers=PractiseLogSerializer(data=request.data,context={'request':request})
-        
-        if serializers.is_valid():  
-            user=serializers.save()
-            return Response({'success':True})
-        else:
+        if request.data['mode']=='practise' or request.data['mode']=='race' or request.data['mode']=='arcade':
+            serializers=PractiseLogSerializer(data=request.data,context={'request':request})
+            if serializers.is_valid():  
+                user=serializers.save()
+                return Response({'success':True})
             return Response({'success':False,'error':serializers.errors},status=status.HTTP_400_BAD_REQUEST)
+        return Response({'success':False,'error':'Invalid mode, should be "practise/race/arcade"'})
 
 class Paradetails(APIView):
     permission_classes=[IsAuthenticated]
