@@ -4,9 +4,10 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth.models import User
 from .models import PractiseLog,Paragraph,DashboardData
-from .serializers import PractiseLogSerializer,ParagraphSerializer
+from .serializers import PractiseLogSerializer,ParagraphSerializer,StreakSerializer
 from rest_framework.permissions import IsAuthenticated,IsAdminUser
 from rest_framework.authtoken.models import Token
+from django.db.models import Sum
 from django.utils import timezone
 from random import randint,choice
 import datetime
@@ -19,14 +20,14 @@ def create_or_update_streak(user,new_entry,mode):
     try:
         last_typed=PractiseLog.objects.filter(user=user).latest('taken_at').taken_at
     except PractiseLog.DoesNotExist:
-        # When its a new user, the first if condition has to be flowed. Hence setting last_typed to previous_day
+        # When its a new user, the first if condition has to be followed. Hence setting last_typed to previous_day
         last_typed=new_entry-datetime.timedelta(1)
 
-    # Finding the difference in days between the last log and the new long
+    # Finding the difference in days between the last log and the new log.
     days_between_recent_and_lastlog=(new_entry-last_typed).days
-    data,created=DashboardData.objects.get_or_create(user=user)
-    
-    # Getting the value of the mode [practise/arcade/race] in the query specified in the user object
+    data=DashboardData.objects.get(user=user)
+
+    # Getting the existing value of the mode [practise/arcade/race] specified in the user object from the query and updating it.
     count=getattr(data,mode)+1
     #Setting the updated value of the mode count
     setattr(data,mode,count)
@@ -34,6 +35,7 @@ def create_or_update_streak(user,new_entry,mode):
     # Checking for consecutive streak from the database, i.e if the difference between previous log and new log is 1, then the user has been typing consecutively
     if days_between_recent_and_lastlog==1:
         data.streak=data.streak+1
+        data.total_streak=1 if data.total_streak==0 else 0 # Incase of new user
         data.longest_streak=data.streak if data.streak>data.longest_streak else data.longest_streak
     # If the difference is greater, then reset the counter
     if days_between_recent_and_lastlog>1:
@@ -133,4 +135,18 @@ class Dashboard(APIView):
     permission_classes=[IsAuthenticated]
 
     def get(self,request):
-        return Response('Under construction')
+        # { avg wpm, avg accuracy, user since, streak, Inactive days, longest streak, Total stresks, mode count }
+        user_id=request.user.id
+
+        dashboard_data={}
+        dashboard_data['user_since']=str(User.objects.get(id=user_id).date_joined)[0:10]
+        total_log=PractiseLog.objects.filter(user=user_id).count()
+        wpm_and_accuracy=PractiseLog.objects.filter(user_id=user_id).aggregate(wpm=Sum('wpm')/total_log,accuracy=Sum('accuracy')/total_log)
+        dashboard_data['wpm']=wpm_and_accuracy['wpm']
+        dashboard_data['accuracy']=wpm_and_accuracy['accuracy']
+        streak_data=DashboardData.objects.get(user_id=user_id)
+        streak_serializer=StreakSerializer(streak_data).data
+        streak_serializer.pop('id')
+        dashboard_data.update(streak_serializer)
+
+        return Response(dashboard_data)

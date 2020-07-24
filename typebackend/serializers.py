@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
-from .models import PractiseLog,Paragraph
+from .models import PractiseLog,Paragraph,DashboardData
 from django.utils import timezone
 
 class ParagraphSerializer(serializers.ModelSerializer):
@@ -34,4 +34,12 @@ class RegisterSerializer(serializers.ModelSerializer):
     def create(self,validated_data):
         user=User.objects.create_user(username=validated_data['username'],password=validated_data['password'],email=validated_data['email'])
         token=Token.objects.create(user=user)
-        return token
+        return token,user
+
+class StreakSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=DashboardData
+        fields='__all__'
+        extra_kwargs={'user':{'write_only':True}}
+
+    

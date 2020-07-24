@@ -2,6 +2,7 @@ from typebackend.serializers import RegisterSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
+from typebackend.models import DashboardData
 from django.contrib.auth.models import User
 from google.auth.transport import requests
 from rest_framework.views import APIView
@@ -16,8 +17,9 @@ class Register(APIView):
     def post(self,request):
         serializer=RegisterSerializer(data=request.data)
         if serializer.is_valid():
-            user=serializer.save()
-            return Response({'success':True,'token':user.key})
+            token,user=serializer.save()
+            DashboardData.objects.create(user=user)
+            return Response({'success':True,'token':token.key})
         else:
             return Response({'success':False,'error':serializer.errors},status=status.HTTP_400_BAD_REQUEST)
 
