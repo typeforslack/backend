@@ -55,12 +55,12 @@
 
     API: /userlog
     Method: POST
-    Request Format: { para: Integer, wpm: Integer, taken_at: DatetimeFormat, correct_words: Integer, wrong_words: Integer, total_words: Integer, accuracy: Float }
+    Request Format: { mode: 'practise/arcade/race', para: Integer, wpm: Integer, taken_at: DatetimeFormat, correct_words: Integer, wrong_words: Integer, total_words: Integer, accuracy: Float }
     Response: {success: Boolean}
 
     API: /getuserlog/last=INT:logDataForLastNDates/
     Method: GET
-    Response: { date: [ wpm: Integer, taken_at: DatetimeFormat, correct_words: Integer, wrong_words: Integer, total_words: Integer, accuracy: Float ] }
+    Response: { date: [ mode: String, wpm: Integer, taken_at: DatetimeFormat, correct_words: Integer, wrong_words: Integer, total_words: Integer, accuracy: Float ] }
 
 **- Creating and retriveing paragraphs:**
 

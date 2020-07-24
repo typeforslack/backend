@@ -24,3 +24,16 @@ class Paragraph(models.Model):
 
     def __str__(self):
         return self.taken_from
+
+class DashboardData(models.Model):
+    user=models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,null=True)
+    streak=models.IntegerField(default=0)
+    inactive_days=models.IntegerField(default=0)
+    longest_streak=models.IntegerField(default=0)
+    total_streak=models.IntegerField(default=0)
+    arcade=models.IntegerField(db_column='Arcade count',default=0)
+    practise=models.IntegerField(db_column='Practise count',default=0)
+    race=models.IntegerField(db_column='Race count',default=0)
+
+    def __str__(self):
+        return self.user.username

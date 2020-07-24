@@ -9,5 +9,6 @@ urlpatterns=[
     path('userlog',typingviews.PostSpeed.as_view(),name='userlog'),
     path('para',typingviews.Paradetails.as_view(),name='para'),
     path('internal/racetrack/para',typingviews.RaceTrack.as_view(),name='racetrack'),
-    re_path(r'^getuserlog/(?:last=(?P<days>\d+)/)?$',typingviews.DashboardData.as_view(),name='graph')
+    path('dashboard',typingviews.Dashboard.as_view(),name='streak'),
+    re_path(r'^getuserlog/(?:last=(?P<days>\d+)/)?$',typingviews.GraphData.as_view(),name='graph')
 ]
