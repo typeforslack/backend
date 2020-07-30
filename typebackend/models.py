@@ -34,6 +34,8 @@ class DashboardData(models.Model):
     arcade=models.IntegerField(db_column='Arcade count',default=0)
     practise=models.IntegerField(db_column='Practise count',default=0)
     race=models.IntegerField(db_column='Race count',default=0)
+    wpm=models.IntegerField(db_column='WPM Average',default=0)
+    accuracy=models.IntegerField(db_column='Accuracy Average',default=0)
 
     def __str__(self):
         return self.user.username

@@ -7,13 +7,13 @@ from .models import PractiseLog,Paragraph,DashboardData
 from .serializers import PractiseLogSerializer,ParagraphSerializer,StreakSerializer
 from rest_framework.permissions import IsAuthenticated,IsAdminUser
 from rest_framework.authtoken.models import Token
-from django.db.models import Sum
-from django.utils import timezone
 from random import randint,choice
+from django.utils import timezone
+from django.db.models import F
 import datetime
 import json
 
-def create_or_update_streak(user,new_entry,mode): 
+def create_or_update_streak(user,new_entry,mode,wpm,accuracy): 
     # Converting string date to datetime format
     new_entry=datetime.datetime.strptime(new_entry,'%Y-%m-%d %H:%M:%S')
 
@@ -35,13 +35,16 @@ def create_or_update_streak(user,new_entry,mode):
     # Checking for consecutive streak from the database, i.e if the difference between previous log and new log is 1, then the user has been typing consecutively
     if days_between_recent_and_lastlog==1:
         data.streak=data.streak+1
-        data.total_streak=1 if data.total_streak==0 else 0 # Incase of new user
         data.longest_streak=data.streak if data.streak>data.longest_streak else data.longest_streak
     # If the difference is greater, then reset the counter
     if days_between_recent_and_lastlog>1:
         data.inactive_days=data.inactive_days+(days_between_recent_and_lastlog-1)
         data.streak=1
         data.total_streak=data.total_streak+1
+
+    para_typed=DashboardData.objects.filter(user=user).annotate(total=F('arcade')+F('practise')+F('race'))[0].total+1
+    data.wpm=((data.wpm*(para_typed-1))+int(wpm))/para_typed
+    data.accuracy=((data.accuracy*(para_typed-1))+int(accuracy))/para_typed
 
     data.save()
 
@@ -50,14 +53,20 @@ class PostSpeed(APIView):
 
     def post(self,request):
         if request.data['mode']=='practise' or request.data['mode']=='race' or request.data['mode']=='arcade':
-            serializers=PractiseLogSerializer(data=request.data,context={'request':request})
+            request.data['user']=request.user.id
+            serializers=PractiseLogSerializer(data=request.data)
             if serializers.is_valid():
                 user=request.user
                 typed_at=request.data['taken_at']
                 mode=request.data['mode']
+                accuracy=request.data['accuracy']
+                wpm=request.data['wpm']
+
                 # Streak counter update 
-                create_or_update_streak(user,typed_at,mode) 
-                user=serializers.save()
+                create_or_update_streak(user,typed_at,mode,wpm,accuracy) 
+
+                saved=serializers.save()
+
                 return Response({'success':True})
             return Response({'success':False,'error':serializers.errors},status=status.HTTP_400_BAD_REQUEST)
         return Response({'success':False,'error':'Invalid mode, should be "practise/race/arcade"'})
@@ -105,7 +114,6 @@ class GraphData(APIView):
 
     def get(self,request,days=0):  
         date_typed_log={}
-
         userlog=PractiseLog.objects.filter(user=request.user,taken_at__gte=timezone.now()-datetime.timedelta(days=int(days)))
         log_serializer=PractiseLogSerializer(userlog,many=True)
 
@@ -113,6 +121,7 @@ class GraphData(APIView):
     
             date_typed=str(data["taken_at"])[0:10]
             data.pop('taken_at')
+            data.pop('id')
     
             if date_typed_log.get(date_typed):
                 date_typed_log[date_typed].append(data)        
@@ -140,10 +149,6 @@ class Dashboard(APIView):
 
         dashboard_data={}
         dashboard_data['user_since']=str(User.objects.get(id=user_id).date_joined)[0:10]
-        total_log=PractiseLog.objects.filter(user=user_id).count()
-        wpm_and_accuracy=PractiseLog.objects.filter(user_id=user_id).aggregate(wpm=Sum('wpm')/total_log,accuracy=Sum('accuracy')/total_log)
-        dashboard_data['wpm']=wpm_and_accuracy['wpm']
-        dashboard_data['accuracy']=wpm_and_accuracy['accuracy']
         streak_data=DashboardData.objects.get(user_id=user_id)
         streak_serializer=StreakSerializer(streak_data).data
         streak_serializer.pop('id')
