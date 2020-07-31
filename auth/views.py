@@ -15,6 +15,11 @@ import time
 
 class Register(APIView):
     def post(self,request):
+        email_id=request.data.get('email',None)
+        user=User.objects.filter(email=email_id).first()
+        if user:
+            return Response({'success':False,'error':'Account already exist'},status=status.HTTP_400_BAD_REQUEST)
+
         serializer=RegisterSerializer(data=request.data)
         if serializer.is_valid():
             token,user=serializer.save()

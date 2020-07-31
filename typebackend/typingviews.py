@@ -9,44 +9,9 @@ from rest_framework.permissions import IsAuthenticated,IsAdminUser
 from rest_framework.authtoken.models import Token
 from random import randint,choice
 from django.utils import timezone
-from django.db.models import F
 import datetime
 import json
 
-def create_or_update_streak(user,new_entry,mode,wpm,accuracy): 
-    # Converting string date to datetime format
-    new_entry=datetime.datetime.strptime(new_entry,'%Y-%m-%d %H:%M:%S')
-
-    try:
-        last_typed=PractiseLog.objects.filter(user=user).latest('taken_at').taken_at
-    except PractiseLog.DoesNotExist:
-        # When its a new user, the first if condition has to be followed. Hence setting last_typed to previous_day
-        last_typed=new_entry-datetime.timedelta(1)
-
-    # Finding the difference in days between the last log and the new log.
-    days_between_recent_and_lastlog=(new_entry-last_typed).days
-    data=DashboardData.objects.get(user=user)
-
-    # Getting the existing value of the mode [practise/arcade/race] specified in the user object from the query and updating it.
-    count=getattr(data,mode)+1
-    #Setting the updated value of the mode count
-    setattr(data,mode,count)
-
-    # Checking for consecutive streak from the database, i.e if the difference between previous log and new log is 1, then the user has been typing consecutively
-    if days_between_recent_and_lastlog==1:
-        data.streak=data.streak+1
-        data.longest_streak=data.streak if data.streak>data.longest_streak else data.longest_streak
-    # If the difference is greater, then reset the counter
-    if days_between_recent_and_lastlog>1:
-        data.inactive_days=data.inactive_days+(days_between_recent_and_lastlog-1)
-        data.streak=1
-        data.total_streak=data.total_streak+1
-
-    para_typed=DashboardData.objects.filter(user=user).annotate(total=F('arcade')+F('practise')+F('race'))[0].total+1
-    data.wpm=((data.wpm*(para_typed-1))+int(wpm))/para_typed
-    data.accuracy=((data.accuracy*(para_typed-1))+int(accuracy))/para_typed
-
-    data.save()
 
 class PostSpeed(APIView):
     permission_classes=[IsAuthenticated]
@@ -55,17 +20,9 @@ class PostSpeed(APIView):
         if request.data['mode']=='practise' or request.data['mode']=='race' or request.data['mode']=='arcade':
             request.data['user']=request.user.id
             serializers=PractiseLogSerializer(data=request.data)
+
             if serializers.is_valid():
-                user=request.user
-                typed_at=request.data['taken_at']
-                mode=request.data['mode']
-                accuracy=request.data['accuracy']
-                wpm=request.data['wpm']
-
-                # Streak counter update 
-                create_or_update_streak(user,typed_at,mode,wpm,accuracy) 
-
-                saved=serializers.save()
+                serializers.save()
 
                 return Response({'success':True})
             return Response({'success':False,'error':serializers.errors},status=status.HTTP_400_BAD_REQUEST)
