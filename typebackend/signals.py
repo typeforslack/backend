@@ -20,7 +20,7 @@ def create_or_update_streak(sender, instance, *args, **kwargs):
 
     # Finding the difference in days between the last log and the new log.
     days_between_recent_and_lastlog=(new_entry-last_typed).days
-    data=DashboardData.objects.get(user=user)
+    data=user.dashboarddata
 
     # Getting the existing value of the mode [practise/arcade/race] specified in the user object from the query and updating it.
     count=getattr(data,mode)+1
@@ -37,8 +37,7 @@ def create_or_update_streak(sender, instance, *args, **kwargs):
         data.streak=1
         data.total_streak=data.total_streak+1
 
-    para_typed=DashboardData.objects.filter(user=user).annotate(total=F('arcade')+F('practise')+F('race'))[0].total+1
+    para_typed=user.dashboarddata.arcade+user.dashboarddata.practise+user.dashboarddata.race+1
     data.wpm=((data.wpm*(para_typed-1))+int(wpm))/para_typed
     data.accuracy=((data.accuracy*(para_typed-1))+int(accuracy))/para_typed
-
     data.save()

@@ -1,12 +1,12 @@
 from django.db import models
 from django.conf import settings
 from django.core.validators import MaxValueValidator
-
+from django.contrib.auth.models import User
 
 # Create your models here.
 
 class PractiseLog(models.Model):
-    user=models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,null=True)
+    user=models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
     para=models.ForeignKey('Paragraph',on_delete=models.CASCADE)
     wpm=models.IntegerField(db_column='Typing Speed',validators=[MaxValueValidator(400)])
     taken_at=models.DateTimeField('Practised On')
@@ -26,16 +26,16 @@ class Paragraph(models.Model):
         return self.taken_from
 
 class DashboardData(models.Model):
-    user=models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE,null=True)
+    user=models.OneToOneField(User,on_delete=models.CASCADE)
     streak=models.IntegerField(default=0)
     inactive_days=models.IntegerField(default=0)
     longest_streak=models.IntegerField(default=0)
     total_streak=models.IntegerField(default=0)
-    arcade=models.IntegerField(db_column='Arcade count',default=0)
-    practise=models.IntegerField(db_column='Practise count',default=0)
-    race=models.IntegerField(db_column='Race count',default=0)
-    wpm=models.IntegerField(db_column='WPM Average',default=0)
-    accuracy=models.IntegerField(db_column='Accuracy Average',default=0)
+    arcade=models.IntegerField(db_column='arcade_count',default=0)
+    practise=models.IntegerField(db_column='practise_count',default=0)
+    race=models.IntegerField(db_column='race_count',default=0)
+    wpm=models.IntegerField(db_column='wpm_average',default=0)
+    accuracy=models.IntegerField(db_column='accuracy_Average',default=0)
 
     def __str__(self):
         return self.user.username

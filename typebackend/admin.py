@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import PractiseLog,Paragraph
+from .models import PractiseLog,Paragraph,DashboardData
 
 # Register your models here.
 
@@ -8,3 +8,4 @@ class TypingAdmin(admin.ModelAdmin):
 
 admin.site.register(PractiseLog,TypingAdmin)
 admin.site.register(Paragraph)
+admin.site.register(DashboardData)
