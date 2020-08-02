@@ -3,26 +3,30 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth.models import User
-from .models import PractiseLog,Paragraph
-from .serializers import PractiseLogSerializer,ParagraphSerializer
+from .models import PractiseLog,Paragraph,DashboardData
+from .serializers import PractiseLogSerializer,ParagraphSerializer,StreakSerializer
 from rest_framework.permissions import IsAuthenticated,IsAdminUser
 from rest_framework.authtoken.models import Token
-from django.utils import timezone
 from random import randint,choice
+from django.utils import timezone
 import datetime
 import json
+
 
 class PostSpeed(APIView):
     permission_classes=[IsAuthenticated]
 
     def post(self,request):
-        serializers=PractiseLogSerializer(data=request.data,context={'request':request})
-        
-        if serializers.is_valid():  
-            user=serializers.save()
-            return Response({'success':True})
-        else:
+        if request.data['mode']=='practise' or request.data['mode']=='race' or request.data['mode']=='arcade':
+            request.data['user']=request.user.id
+            serializers=PractiseLogSerializer(data=request.data)
+
+            if serializers.is_valid():
+                serializers.save()
+
+                return Response({'success':True})
             return Response({'success':False,'error':serializers.errors},status=status.HTTP_400_BAD_REQUEST)
+        return Response({'success':False,'error':'Invalid mode, should be "practise/race/arcade"'})
 
 class Paradetails(APIView):
     permission_classes=[IsAuthenticated]
@@ -62,12 +66,11 @@ class Paradetails(APIView):
         else:
             return Response({'success':False,'error':serializers.errors},status=status.HTTP_400_BAD_REQUEST)
 
-class DashboardData(APIView):
+class GraphData(APIView):
     permission_classes=[IsAuthenticated]
 
     def get(self,request,days=0):  
         date_typed_log={}
-
         userlog=PractiseLog.objects.filter(user=request.user,taken_at__gte=timezone.now()-datetime.timedelta(days=int(days)))
         log_serializer=PractiseLogSerializer(userlog,many=True)
 
@@ -75,6 +78,7 @@ class DashboardData(APIView):
     
             date_typed=str(data["taken_at"])[0:10]
             data.pop('taken_at')
+            data.pop('id')
     
             if date_typed_log.get(date_typed):
                 date_typed_log[date_typed].append(data)        
@@ -92,3 +96,19 @@ class RaceTrack(APIView):
         chosen_paragraph=choice(para_yet_to_be_typed)
         serializers=ParagraphSerializer(chosen_paragraph)
         return Response(serializers.data)
+
+class Dashboard(APIView):
+    permission_classes=[IsAuthenticated]
+
+    def get(self,request):
+        # { avg wpm, avg accuracy, user since, streak, Inactive days, longest streak, Total stresks, mode count }
+        user_id=request.user.id
+
+        dashboard_data={}
+        dashboard_data['user_since']=str(User.objects.get(id=user_id).date_joined)[0:10]
+        streak_data=DashboardData.objects.get(user_id=user_id)
+        streak_serializer=StreakSerializer(streak_data).data
+        streak_serializer.pop('id')
+        dashboard_data.update(streak_serializer)
+
+        return Response(dashboard_data)

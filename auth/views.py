@@ -2,6 +2,7 @@ from typebackend.serializers import RegisterSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
+from typebackend.models import DashboardData
 from django.contrib.auth.models import User
 from google.auth.transport import requests
 from rest_framework.views import APIView
@@ -14,10 +15,16 @@ import time
 
 class Register(APIView):
     def post(self,request):
+        email_id=request.data.get('email',None)
+        user=User.objects.filter(email=email_id).first()
+        if user:
+            return Response({'success':False,'error':'Account already exist'},status=status.HTTP_400_BAD_REQUEST)
+
         serializer=RegisterSerializer(data=request.data)
         if serializer.is_valid():
-            user=serializer.save()
-            return Response({'success':True,'token':user.key})
+            token,user=serializer.save()
+            DashboardData.objects.create(user=user)
+            return Response({'success':True,'token':token.key})
         else:
             return Response({'success':False,'error':serializer.errors},status=status.HTTP_400_BAD_REQUEST)
 
@@ -37,17 +44,14 @@ class LoginOrSignUpForGoogleUsers(APIView):
                 if serializer.is_valid():
                     user=serializer.save()
                     return Response({'success':True,'token':user.key})
-                else:
-                    return Response({'success':False,'error':serializer.errors},status=status.HTTP_400_BAD_REQUEST)
+                return Response({'success':False,'error':serializer.errors},status=status.HTTP_400_BAD_REQUEST)
             elif user_details:
                 if username is None:
-                    token=Token.objects.create(user=user_details)
+                    token,created=Token.objects.get_or_create(user=user_details)
                     return Response({'token':token.key})
                 return Response({'error':'Account exists!'},status=status.HTTP_400_BAD_REQUEST)
-            else:
-                return Response({'error':'New account, please register!'},status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response({'error':'Invalid email ID '},status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error':'New account, please register!'},status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error':'Invalid email ID '},status=status.HTTP_400_BAD_REQUEST)
 
 class Logout(APIView):
     permission_classes=[IsAuthenticated]
